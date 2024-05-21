@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Gerador de Chaves 1.0</title>
+</head>
+<body>
+    <label for="chave-label">A call de hoje termina com chave de:</label>
+    <label id="chave" for="chave-label"></label>
+    <button id="gerar-chave">Gerar Chave</button>
+
+    <script>
+
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        var chaves = {
+            "lixo": "#8B4513", // Marrom
+            "esterco": "#8B4513", // Marrom
+            "tolete": "#8B4513", // Marrom
+            "estrume": "#8B4513", // Marrom
+            "lodo": "#8B4513", // Marrom
+            "ponta do bé": "#A52A2A", // Castanho escuro
+            "sucata": "#A9A9A9", // Cinza escuro
+            "entulho": "#A9A9A9", // Cinza escuro
+            "plástico": "#4682B4", // Azul-aco
+            "papelão molhado": "#FFFF00", // Amarelo
+            "lama": "#8B4513", // Marrom
+            "fio elétrico exposto": "#FF0000", // Vermelho
+            "isopor": "#FFD700", // Dourado
+            "mofo": "#808080", // Cinza
+            "fio desencapado": "#FF0000", // Vermelho
+            "papel carbonizado": "#000000", // Preto
+            "borracha ressecada": "#000000", // Preto
+            "derby azul": "#0000FF", // Azul
+            "morboro fumado": "#A52A2A", // Castanho escuro
+            "bronze": "#CD7F32", // Bronze
+            "prata": "#C0C0C0", // Prata
+            "ouro": "#FFD700", // Dourado
+            "platina": "#C0C0C0", // Prata
+            "rubi": "#FF4500", // Laranja avermelhado
+            "topázio": "#FFA500", // Laranja
+            "esmeralda": "#008000", // Verde
+            "cristal": "#FFFFFF", // Branco
+            "diamante": "#FFFFFF" // Branco
+        };
+
+        document.getElementById('gerar-chave').addEventListener('click', function() {
+            var numeroAleatorio = getRandomNumber(1, 27); // Considerando que há 27 chaves no dicionário
+            var chavesNomes = Object.keys(chaves);
+            var valorChave = chavesNomes[numeroAleatorio - 1];
+            var corChave = chaves[valorChave];
+
+            document.getElementById('chave').textContent = valorChave;
+            document.getElementById('chave').style.color = corChave;
+        });
+    </script>
+</body>
+</html>
+
