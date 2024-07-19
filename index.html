@@ -7,19 +7,32 @@
     <title>Gerador de Chaves 1.0</title>
 </head>
 <body>
-    <label for="chave-label">A call de hoje termina com chave de:</label>
-    <label id="chave" for="chave-label"></label>
-    <button id="gerar-chave">Gerar Chave</button>
+    <div class="container">
+        <label for="chave-label">A call de hoje termina com chave de:</label>
+        <label id="chave" for="chave-label"></label>
+        <button id="gerar-chave">Gerar Chave</button>
+
+        <hr>
+
+        <p id="contagem-padrao"></p>
+        <p id="contagem-usuario"></p>
+
+        <div class="adicionar-chaves-container">
+            <h2>Adicionar Nova Chave</h2>
+            <div class="inputs-container">
+                <label for="nova-chave-nome">Nome da nova chave:</label>
+                <input type="text" id="nova-chave-nome">
+                <label for="nova-chave-cor">Cor da nova chave:</label>
+                <input type="color" id="nova-chave-cor">
+                <button id="adicionar-chave">Adicionar Chave</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-
-        function getRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        var chaves = {
+        const chavesPadrao = {
             "lixo": "#8B4513", // Marrom
-            "vomito": "F5F5DC", // Bege
+            "vomito": "#F5F5DC", // Bege
             "esterco": "#8B4513", // Marrom
             "tolete": "#8B4513", // Marrom
             "estrume": "#8B4513", // Marrom
@@ -49,8 +62,40 @@
             "diamante": "#FFFFFF" // Branco
         };
 
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Função para carregar as chaves do localStorage
+        function loadChaves() {
+            var chaves = localStorage.getItem('chaves');
+            if (chaves) {
+                return JSON.parse(chaves);
+            } else {
+                return { ...chavesPadrao }; // Retorna uma cópia das chaves padrão
+            }
+        }
+
+        // Função para salvar as chaves no localStorage
+        function saveChaves(chaves) {
+            localStorage.setItem('chaves', JSON.stringify(chaves));
+        }
+
+        // Função para atualizar a contagem de chaves
+        function atualizarContagem() {
+            const totalChaves = Object.keys(chaves).length;
+            const chavesPadraoCount = Object.keys(chavesPadrao).length;
+            const chavesUsuarioCount = totalChaves - chavesPadraoCount;
+
+            document.getElementById('contagem-padrao').textContent = `Chaves padrão: ${chavesPadraoCount}`;
+            document.getElementById('contagem-usuario').textContent = `Chaves adicionadas pelo usuário: ${chavesUsuarioCount}`;
+        }
+
+        var chaves = loadChaves();
+        atualizarContagem();
+
         document.getElementById('gerar-chave').addEventListener('click', function() {
-            var numeroAleatorio = getRandomNumber(1, 27); // Considerando que há 27 chaves no dicionário
+            var numeroAleatorio = getRandomNumber(1, Object.keys(chaves).length);
             var chavesNomes = Object.keys(chaves);
             var valorChave = chavesNomes[numeroAleatorio - 1];
             var corChave = chaves[valorChave];
@@ -58,7 +103,24 @@
             document.getElementById('chave').textContent = valorChave;
             document.getElementById('chave').style.color = corChave;
         });
+
+        document.getElementById('adicionar-chave').addEventListener('click', function() {
+            var nomeNovaChave = document.getElementById('nova-chave-nome').value.trim().toLowerCase();
+            var corNovaChave = document.getElementById('nova-chave-cor').value.trim();
+
+            if (nomeNovaChave && /^#[0-9A-F]{6}$/i.test(corNovaChave)) {
+                chaves[nomeNovaChave] = corNovaChave;
+                saveChaves(chaves); // Salva as chaves no localStorage
+                atualizarContagem(); // Atualiza a contagem de chaves
+                alert('Nova chave adicionada com sucesso!');
+            } else {
+                alert('Por favor, insira um nome de chave válido e uma cor hexadecimal no formato #RRGGBB.');
+            }
+
+            // Limpa os campos de entrada
+            document.getElementById('nova-chave-nome').value = '';
+            document.getElementById('nova-chave-cor').value = '#000000';
+        });
     </script>
 </body>
 </html>
-

@@ -4,13 +4,26 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 100vh;
     background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
 }
 
 label {
     font-size: 24px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     color: #333;
 }
 
@@ -23,7 +36,7 @@ button {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    margin-left: 30px;
+    margin-top: 20px;
 }
 
 button:hover {
@@ -34,5 +47,59 @@ button:hover {
     font-size: 28px;
     color: #007bff;
     font-weight: bold;
-    margin-left: 30px;
+    margin: 20px 0;
+}
+
+input[type="text"],
+input[type="color"] {
+    font-size: 18px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="color"] {
+    padding: 0;
+    width: 24px;
+    height: 24px;
+}
+
+#contagem-padrao, #contagem-usuario {
+    font-size: 18px;
+    color: #333;
+    margin-top: 10px;
+}
+
+.inputs-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.inputs-container label, .inputs-container input {
+    width: calc(100% - 24px);
+}
+
+.inputs-container button {
+    width: calc(100% - 24px);
+}
+
+.adicionar-chaves-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fafafa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-top: 20px;
+}
+
+.adicionar-chaves-container h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
 }
