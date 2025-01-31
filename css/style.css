@@ -1,15 +1,19 @@
+/* Removendo rolagem do corpo da página e permitindo rolagem no body */
 body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
+    overflow-y: auto; /* Permite rolagem no corpo da página */
+    box-sizing: border-box; /* Ajuste de caixa de layout */
 }
 
+/* O container agora tem um tamanho fixo, sem rolagem */
 .container {
     display: flex;
     flex-direction: column;
@@ -18,7 +22,11 @@ body {
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 400px;
+    width: 1000px;  /* Largura fixa */
+    max-width: 500px; /* Limita a largura máxima */
+    margin: 0 auto;   /* Alinha o container ao centro */
+    height: auto;     /* Ajusta a altura para o conteúdo */
+    box-sizing: border-box;
 }
 
 label {
@@ -48,6 +56,7 @@ button:hover {
     color: #007bff;
     font-weight: bold;
     margin: 20px 0;
+    text-shadow: 1px 1px 2px black, 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 input[type="text"],
@@ -102,4 +111,46 @@ input[type="color"] {
     font-size: 20px;
     margin-bottom: 20px;
     color: #333;
+}
+
+#tabela-chaves-container {
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.scroll-tabela {
+    max-height: 300px; /* Define altura máxima para a tabela */
+    overflow-y: auto;  /* Ativa o scroll apenas se necessário */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#tabela-chaves {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#tabela-chaves th, #tabela-chaves td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+#tabela-chaves th {
+    background-color: #007bff;
+    color: white;
+}
+
+#tabela-chaves td {
+    font-weight: bold;
+}
+
+button {
+    margin: 10px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
 }

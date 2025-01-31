@@ -4,9 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/style.css">
-    <title>Gerador de Chaves 1.0</title>
+    <title>Gerador de Chaves 2.0</title>
+    <script src="https://www.gstatic.com/firebasejs/11.2.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+    <script type="module">
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyDBrVpoLefVRylIArq7gpz8dwtvk3jp_EY",
+          authDomain: "chaves-9c245.firebaseapp.com",
+          projectId: "chaves-9c245",
+          storageBucket: "chaves-9c245.firebasestorage.app",
+          messagingSenderId: "358363743044",
+          appId: "1:358363743044:web:c1f8a7b3e52ea529554d11"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        let chaves = {};
+
+        async function carregarChaves() {
+            try {
+                const snapshot = await db.collection("chaves").get();
+                chaves = {};
+                snapshot.forEach(doc => {
+                    chaves[doc.id] = doc.data().cor;
+                });
+                atualizarContagem();
+            } catch (error) {
+                console.error("Erro ao carregar chaves:", error);
+            }
+        }
+
+        async function adicionarChave() {
+            const nomeNovaChave = document.getElementById('nova-chave-nome').value.trim().toLowerCase();
+            const corNovaChave = document.getElementById('nova-chave-cor').value.trim();
+
+            if (!nomeNovaChave || !/^#[0-9A-F]{6}$/i.test(corNovaChave)) {
+                alert('Por favor, insira um nome válido e uma cor hexadecimal no formato #RRGGBB.');
+                return;
+            }
+
+            try {
+                await db.collection("chaves").doc(nomeNovaChave).set({ cor: corNovaChave });
+                alert("Nova chave adicionada com sucesso!");
+                document.getElementById('nova-chave-nome').value = "";
+                document.getElementById('nova-chave-cor').value = "#000000";
+                carregarChaves();
+            } catch (error) {
+                console.error("Erro ao adicionar chave:", error);
+            }
+        }
+
+        function gerarChave() {
+            const chavesNomes = Object.keys(chaves);
+            if (chavesNomes.length === 0) {
+                alert("Nenhuma chave disponível. Adicione novas chaves.");
+                return;
+            }
+            const numeroAleatorio = Math.floor(Math.random() * chavesNomes.length);
+            const valorChave = chavesNomes[numeroAleatorio];
+            const corChave = chaves[valorChave];
+
+            document.getElementById('chave').textContent = valorChave;
+            document.getElementById('chave').style.color = corChave;
+            document.getElementById('chave').style.textShadow = "1px 1px 2px black"; // Contorno preto
+        }
+
+        function atualizarContagem() {
+            const totalChaves = Object.keys(chaves).length;
+            document.getElementById('contagem-padrao').textContent = `Total de chaves: ${totalChaves}`;
+        }
+
+        async function mostrarTabelaChaves() {
+            try {
+                const tabelaContainer = document.getElementById("tabela-chaves-container");
+                const tabelaBody = document.getElementById("tabela-chaves").querySelector("tbody");
+
+                tabelaBody.innerHTML = ""; // Limpa a tabela antes de preencher
+
+                for (const [nome, cor] of Object.entries(chaves)) {
+                    const linha = document.createElement("tr");
+                    linha.innerHTML = `
+                        <td>${nome}</td>
+                        <td style="background-color: ${cor}; color: ${cor === '#ffffff' ? 'black' : 'white'}; padding: 5px;">${cor}</td>
+                    `;
+                    tabelaBody.appendChild(linha);
+                }
+
+                // Exibe a tabela
+                tabelaContainer.style.display = "block";
+                tabelaContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+            } catch (error) {
+                console.error("Erro ao exibir tabela de chaves:", error);
+            }
+        }
+
+        document.getElementById('gerar-chave').addEventListener('click', gerarChave);
+        document.getElementById('adicionar-chave').addEventListener('click', adicionarChave);
+        document.getElementById("mostrar-chaves").addEventListener("click", mostrarTabelaChaves);
+
+        carregarChaves();
+    </script>
+
     <div class="container">
         <label for="chave-label">A call de hoje termina com chave de:</label>
         <label id="chave" for="chave-label"></label>
@@ -15,7 +116,6 @@
         <hr>
 
         <p id="contagem-padrao"></p>
-        <p id="contagem-usuario"></p>
 
         <div class="adicionar-chaves-container">
             <h2>Adicionar Nova Chave</h2>
@@ -23,104 +123,29 @@
                 <label for="nova-chave-nome">Nome da nova chave:</label>
                 <input type="text" id="nova-chave-nome">
                 <label for="nova-chave-cor">Cor da nova chave:</label>
-                <input type="color" id="nova-chave-cor">
+                <input type="color" id="nova-chave-cor" value="#000000">
                 <button id="adicionar-chave">Adicionar Chave</button>
             </div>
         </div>
+
+        <hr>
+
+        <button id="mostrar-chaves">Mostrar Chaves</button>
+
+        <div id="tabela-chaves-container">
+            <h2>Chaves Disponíveis</h2>
+            <div class="scroll-tabela">
+                <table id="tabela-chaves">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Cor</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-
-    <script>
-        const chavesPadrao = {
-            "lixo": "#8B4513", // Marrom
-            "vomito": "#F5F5DC", // Bege
-            "esterco": "#8B4513", // Marrom
-            "tolete": "#8B4513", // Marrom
-            "estrume": "#8B4513", // Marrom
-            "lodo": "#8B4513", // Marrom
-            "ponta do bé": "#A52A2A", // Castanho escuro
-            "sucata": "#A9A9A9", // Cinza escuro
-            "entulho": "#A9A9A9", // Cinza escuro
-            "plástico": "#4682B4", // Azul-aco
-            "papelão molhado": "#FFFF00", // Amarelo
-            "lama": "#8B4513", // Marrom
-            "fio elétrico exposto": "#FF0000", // Vermelho
-            "isopor": "#FFD700", // Dourado
-            "mofo": "#808080", // Cinza
-            "fio desencapado": "#FF0000", // Vermelho
-            "papel carbonizado": "#000000", // Preto
-            "borracha ressecada": "#000000", // Preto
-            "derby azul": "#0000FF", // Azul
-            "marboro fumado": "#A52A2A", // Castanho escuro
-            "bronze": "#CD7F32", // Bronze
-            "prata": "#C0C0C0", // Prata
-            "ouro": "#FFD700", // Dourado
-            "platina": "#C0C0C0", // Prata
-            "rubi": "#FF4500", // Laranja avermelhado
-            "topázio": "#FFA500", // Laranja
-            "esmeralda": "#008000", // Verde
-            "cristal": "#FFFFFF", // Branco
-            "diamante": "#FFFFFF" // Branco
-        };
-
-        function getRandomNumber(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        // Função para carregar as chaves do localStorage
-        function loadChaves() {
-            var chaves = localStorage.getItem('chaves');
-            if (chaves) {
-                return JSON.parse(chaves);
-            } else {
-                return { ...chavesPadrao }; // Retorna uma cópia das chaves padrão
-            }
-        }
-
-        // Função para salvar as chaves no localStorage
-        function saveChaves(chaves) {
-            localStorage.setItem('chaves', JSON.stringify(chaves));
-        }
-
-        // Função para atualizar a contagem de chaves
-        function atualizarContagem() {
-            const totalChaves = Object.keys(chaves).length;
-            const chavesPadraoCount = Object.keys(chavesPadrao).length;
-            const chavesUsuarioCount = totalChaves - chavesPadraoCount;
-
-            document.getElementById('contagem-padrao').textContent = `Chaves padrão: ${chavesPadraoCount}`;
-            document.getElementById('contagem-usuario').textContent = `Chaves adicionadas pelo usuário: ${chavesUsuarioCount}`;
-        }
-
-        var chaves = loadChaves();
-        atualizarContagem();
-
-        document.getElementById('gerar-chave').addEventListener('click', function() {
-            var numeroAleatorio = getRandomNumber(1, Object.keys(chaves).length);
-            var chavesNomes = Object.keys(chaves);
-            var valorChave = chavesNomes[numeroAleatorio - 1];
-            var corChave = chaves[valorChave];
-
-            document.getElementById('chave').textContent = valorChave;
-            document.getElementById('chave').style.color = corChave;
-        });
-
-        document.getElementById('adicionar-chave').addEventListener('click', function() {
-            var nomeNovaChave = document.getElementById('nova-chave-nome').value.trim().toLowerCase();
-            var corNovaChave = document.getElementById('nova-chave-cor').value.trim();
-
-            if (nomeNovaChave && /^#[0-9A-F]{6}$/i.test(corNovaChave)) {
-                chaves[nomeNovaChave] = corNovaChave;
-                saveChaves(chaves); // Salva as chaves no localStorage
-                atualizarContagem(); // Atualiza a contagem de chaves
-                alert('Nova chave adicionada com sucesso!');
-            } else {
-                alert('Por favor, insira um nome de chave válido e uma cor hexadecimal no formato #RRGGBB.');
-            }
-
-            // Limpa os campos de entrada
-            document.getElementById('nova-chave-nome').value = '';
-            document.getElementById('nova-chave-cor').value = '#000000';
-        });
-    </script>
 </body>
 </html>
