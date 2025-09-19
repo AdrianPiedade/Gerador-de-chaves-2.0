@@ -29,17 +29,22 @@
                 const snapshot = await db.collection("chaves").get();
                 chaves = {};
                 snapshot.forEach(doc => {
-                    chaves[doc.id] = doc.data().cor;
+                    const data = doc.data();
+                    chaves[doc.id] = {
+                      cor: data.cor,
+                      lore: data.lore
+                    };
                 });
                 atualizarContagem();
             } catch (error) {
                 console.error("Erro ao carregar chaves:", error);
             }
         }
-
+    
         async function adicionarChave() {
             const nomeNovaChave = document.getElementById('nova-chave-nome').value.trim().toLowerCase();
             const corNovaChave = document.getElementById('nova-chave-cor').value.trim();
+            const loreDaChave = document.getElementById('lore-da-chave').value.trim();
 
             if (!nomeNovaChave || !/^#[0-9A-F]{6}$/i.test(corNovaChave)) {
                 alert('Por favor, insira um nome válido e uma cor hexadecimal no formato #RRGGBB.');
@@ -47,9 +52,10 @@
             }
 
             try {
-                await db.collection("chaves").doc(nomeNovaChave).set({ cor: corNovaChave });
+                await db.collection("chaves").doc(nomeNovaChave).set({ cor: corNovaChave, lore: loreDaChave });
                 alert("Nova chave adicionada com sucesso!");
                 document.getElementById('nova-chave-nome').value = "";
+                document.getElementById('lore-da-chave').value = "";
                 document.getElementById('nova-chave-cor').value = "#000000";
                 carregarChaves();
             } catch (error) {
@@ -65,7 +71,7 @@
             }
             const numeroAleatorio = Math.floor(Math.random() * chavesNomes.length);
             const valorChave = chavesNomes[numeroAleatorio];
-            const corChave = chaves[valorChave];
+            const corChave = chaves[valorChave].cor;
 
             document.getElementById('chave').textContent = valorChave;
             document.getElementById('chave').style.color = corChave;
@@ -84,11 +90,18 @@
 
                 tabelaBody.innerHTML = ""; // Limpa a tabela antes de preencher
 
-                for (const [nome, cor] of Object.entries(chaves)) {
+                for (const nome of Object.keys(chaves)) {
+                    const { cor, lore } = chaves[nome];
                     const linha = document.createElement("tr");
                     linha.innerHTML = `
                         <td>${nome}</td>
                         <td style="background-color: ${cor}; color: ${cor === '#ffffff' ? 'black' : 'white'}; padding: 5px;">${cor}</td>
+                        <td>
+                            <div class="tooltip-container">
+                                <span class="tooltip-icon">ℹ️</span>
+                                <div class="tooltip-content">${lore}</div>
+                            </div>
+                        </td>
                     `;
                     tabelaBody.appendChild(linha);
                 }
@@ -96,9 +109,35 @@
                 // Exibe a tabela
                 tabelaContainer.style.display = "block";
                 tabelaContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+                
+                // Adiciona os event listeners para os tooltips
+                adicionarEventListenersTooltips();
             } catch (error) {
                 console.error("Erro ao exibir tabela de chaves:", error);
             }
+        }
+
+        function adicionarEventListenersTooltips() {
+            const tooltipContainers = document.querySelectorAll('.tooltip-container');
+            
+            tooltipContainers.forEach(container => {
+                const tooltip = container.querySelector('.tooltip-content');
+                
+                container.addEventListener('mousemove', (e) => {
+                    tooltip.style.top = (e.clientY - 50) + 'px';
+                    tooltip.style.left = (e.clientX + 15) + 'px';
+                });
+                
+                container.addEventListener('mouseenter', () => {
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    tooltip.style.visibility = 'hidden';
+                    tooltip.style.opacity = '0';
+                });
+            });
         }
 
         document.getElementById('gerar-chave').addEventListener('click', gerarChave);
@@ -122,6 +161,8 @@
             <div class="inputs-container">
                 <label for="nova-chave-nome">Nome da nova chave:</label>
                 <input type="text" id="nova-chave-nome">
+                <label for="lore-da-chave">Lore da chave:</label>
+                <input type="text" id="lore-da-chave">
                 <label for="nova-chave-cor">Cor da nova chave:</label>
                 <input type="color" id="nova-chave-cor" value="#000000">
                 <button id="adicionar-chave">Adicionar Chave</button>
@@ -140,6 +181,7 @@
                         <tr>
                             <th>Nome</th>
                             <th>Cor</th>
+                            <th>Lore</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
